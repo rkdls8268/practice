@@ -1,26 +1,10 @@
-const kakao = require('../config/kakao');
-const axios = require('axios');
-// const linkUser = require('../modules/linkUser');
+// https://devhaks.github.io/2019/05/31/oauth2/ 참고
+// https://blog.naver.com/PostView.nhn?blogId=psj9102&logNo=221326329058&categoryNo=40&parentCategoryNo=0&viewDate=&currentPage=1&postListTopCurrentPage=1&from=postView 참고
 
-// function linkUser(session, provider, authData) {
-//     let result = false;
-//     if (session.authData) {
-//       if (session.authData[provider]) {
-//         // 이미 계정에 provider 가 연결되어 있는 경우
-//         return result;
-//       }
-  
-//       session.authData[provider] = authData;
-//     } else {
-//       session.authData = {
-//         [provider]: authData
-//       };
-//     }
-  
-//     result = true;
-  
-//     return result;
-// }
+const kakao = require('../config/kakao');
+// const axios = require('axios');
+// const request = require('request');
+const rp = require('request-promise');
 
 const auth = {
     kakaoLogin: async (req, res) => {
@@ -40,64 +24,51 @@ const auth = {
         const { code } = req.query;
         console.log('code: ', code);
 
-        let tokenResponse;
-        try {
-            // Authorization Server 부터 Access token 발급받기
-            // axios: HTTP 통신을 하는데 사용하는 js 라이브러리
-            tokenResponse = await axios({
-                method: "POST",
-                url: 'https://kauth.kakao.com/oauth/token',
-                headers: {
-                    "content-type": "application/x-www-form-urlencoded"
-                },
-                data: qs.stringify({
-                    grant_type: "authorization_code",
-                    client_id: kakao.clientID,
-                    client_secret: kakao.clientSecret,
-                    redirect_uri: kakao.redirectURI,
-                    code: code
-                })
-            });
-        } catch (error) {
-            return res.json(error.data);
+        const options = {
+            uri: 'https://kauth.kakao.com/oauth/token',
+            method: 'POST',
+            form: {
+                grant_type: "authorization_code",
+                client_id: kakao.clientID,
+                client_secret: kakao.clientSecret,
+                redirect_uri: kakao.redirectURI,
+                code: code
+            },
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded;charset=utf-8'
+            },
+            json: true
         }
 
-        console.info("==== tokenResponse.data ====");
-        console.log(tokenResponse.data);
+        // npm request-promise 사용
+        const cb = await rp(options);
 
-        const { access_token } = tokenResponse.data;
+        console.log('cb', cb);
+        // cb 에 있는 정보들 db에 저장하는 model 하나 만들어 주면 될듯~~
 
-        let userResponse;
-        try {
-            // access_token 으로 사용자 정보 요청하기
-            userResponse = await axios({
-                method: "GET",
-                url: "https://kapi.kakao.com/v2/user/me",
-                headers: {
-                    Authorization: `Bearer ${access_token}`
-                }
-            });
-        } catch (error) {
-            return res.json(error.data);
+        const access_token = cb.access_token;
+
+        const userResponse = {
+            uri: 'https://kapi.kakao.com/v2/user/me',
+            method: 'GET',
+            // form: {
+            //     grant_type: "authorization_code",
+            //     client_id: kakao.clientID,
+            //     client_secret: kakao.clientSecret,
+            //     redirect_uri: kakao.redirectURI,
+            //     code: code
+            // },
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            },
+            json: true
         }
 
-        console.info("==== userResponse.data ====");
-        console.log(userResponse.data);
+        const ur = await rp(userResponse);
 
-        // const authData = {
-        //     ...tokenResponse.data,
-        //     ...userResponse.data
-        // };
+        console.log('userResponse', ur);
 
-        // const result = linkUser(session, "kakao", authData);
-
-        // if (result) {
-        //     console.info("계정에 연결되었습니다.");
-        // } else {
-        //     console.warn("이미 연결된 계정입니다.");
-        // }
-
-        res.redirect("/");
+        return res.redirect('/');
     }
 };
 
