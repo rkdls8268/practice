@@ -139,41 +139,42 @@ const auth = {
 
         return res.redirect('/');
     },
-    gmailLogain: async (req, res) => {
-        const client = new OAuth2Client(gmail.clientID);
-        async function verify() {
-            const ticket = await client.verifyIdToken({
-                idToken: token,
-                audience: kakao.clientID
-            });
-            const payload = ticket.getPayload();
-            const userid = payload['sub'];
-        }
+    gmailLogin: async (req, res) => {
+        // const client = new OAuth2Client(gmail.clientID);
+        // async function verify() {
+        //     const ticket = await client.verifyIdToken({
+        //         idToken: token,
+        //         audience: kakao.clientID
+        //     });
+        //     const payload = ticket.getPayload();
+        //     const userid = payload['sub'];
+        // }
 
-        verify().catch(console.error);
-        // const gmailAuthUrl = `https://appleid.apple.com/auth/authorize? 
-        //     response_type=code%20id_token
-        //     &client_id=${apple.clientID}
-        //     &redirect_uri=${apple.redirectURI}
-        //     &state=${apple.state}
-        //     &scope=${apple.scope}
-        //     &response_mode=form_post`;
+        // verify().catch(console.error);
+        // gmailAuthUrl이 제대로 동작하지 않는듯... 다시 해보자~
+        const gmailAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?
+            scope=https%3A//www.googleapis.com/auth/contacts.readonly
+            &access_type=offline
+            &include_granted_scopes=true
+            &response_type=code
+            &client_id=${gmail.clientID}
+            &redirect_uri=${gmail.redirectURI}`;
         
-        // console.log('gmailAuthUrl: ', gmailAuthUrl);
-        // return res.redirect(gmailAuthUrl);
+        console.log('gmailAuthUrl: ', gmailAuthUrl);
+        return res.redirect(gmailAuthUrl);
     },
     gmailCallback: async (req, res) => {
         const { code } = req.query;
         console.log('code: ', code);
 
         const options = {
-            uri: 'https://kauth.kakao.com/oauth/token',
+            uri: 'https://oauth2.googleapis.com/token',
             method: 'POST',
             form: {
                 grant_type: "authorization_code",
-                client_id: kakao.clientID,
-                client_secret: kakao.clientSecret,
-                redirect_uri: kakao.redirectURI,
+                client_id: gmail.clientID,
+                client_secret: gmail.clientSecret,
+                redirect_uri: gmail.redirectURI,
                 code: code
             },
             headers: {
@@ -191,7 +192,7 @@ const auth = {
         const access_token = cb.access_token;
 
         const userResponse = {
-            uri: 'https://kapi.kakao.com/v2/user/me',
+            uri: 'https://www.googleapis.com/drive/v2/files',
             method: 'GET',
             // form: {
             //     grant_type: "authorization_code",
