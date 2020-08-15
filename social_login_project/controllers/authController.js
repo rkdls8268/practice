@@ -153,7 +153,7 @@ const auth = {
         // verify().catch(console.error);
         // gmailAuthUrl이 제대로 동작하지 않는듯... 다시 해보자~
         const gmailAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?
-            scope=https%3A//www.googleapis.com/auth/contacts.readonly
+            scope=https://www.googleapis.com/auth/contacts.readonly
             &access_type=offline
             &include_granted_scopes=true
             &response_type=code
