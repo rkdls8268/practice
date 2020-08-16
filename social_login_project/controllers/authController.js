@@ -190,9 +190,10 @@ const auth = {
         // cb 에 있는 정보들 db에 저장하는 model 하나 만들어 주면 될듯~~
 
         const access_token = cb.access_token;
+        console.log('access_token: ', access_token);
 
         const userResponse = {
-            uri: 'https://www.googleapis.com/drive/v2/files',
+            uri: 'https://www.googleapis.com/drive/v2/files?key=AIzaSyCIzkHn7sq67YB2hJ62HFVn4I1WtvvYPYI',
             method: 'GET',
             // form: {
             //     grant_type: "authorization_code",
