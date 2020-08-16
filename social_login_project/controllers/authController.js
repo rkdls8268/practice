@@ -192,8 +192,10 @@ const auth = {
         const access_token = cb.access_token;
         console.log('access_token: ', access_token);
 
+        // 무슨 문제인지 알겠다..!!!
+        // drive 관련 api 를 받아야 userResponose 가 실행이 될듯~~
         const userResponse = {
-            uri: 'https://www.googleapis.com/drive/v2/files?key=AIzaSyCIzkHn7sq67YB2hJ62HFVn4I1WtvvYPYI',
+            uri: 'https://www.googleapis.com/drive/v2/files',
             method: 'GET',
             // form: {
             //     grant_type: "authorization_code",
