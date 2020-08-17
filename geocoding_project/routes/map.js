@@ -3,6 +3,8 @@ const router = express.Router();
 
 const MapController = require('../controllers/mapController');
 
-router.get('/geocoding', MapController.getLatLong);
+// google geocoding api는 유료임. 결제해야함..!
+router.get('/google', MapController.getGoogleLatLong);
+router.get('/naver', MapController.getNaverLatLong);
 
 module.exports = router;
