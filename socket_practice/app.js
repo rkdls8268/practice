@@ -22,6 +22,7 @@ app.io.on('connection', (socket) => {
   });
 
   socket.on('chat-msg-1', (msg) => {
+    // index.jade에서 이 코드를 실행하게 되면 아래의 코드를 통해 index.jade 내부에 있는 socket.on('chat-msg-2'~~~를 실행
     app.io.emit('chat-msg-2', msg);
   });
 });
